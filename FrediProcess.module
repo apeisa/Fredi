@@ -37,6 +37,8 @@ class FrediProcess extends Process {
 	public $fields;
 	public $fieldsArray = array();
 	public $inputField;
+	public $pageEdit;
+	public $form;
 
 	public function init() {
 		parent::init(); // required
@@ -49,10 +51,11 @@ class FrediProcess extends Process {
 		$this->fields = $this->input->get("fields");
 		
 		$this->pageContext = $this->pages->get($this->pageId);
+		$this->pageContext->setTrackChanges(true); 
 		$this->fieldsArray = explode("|", $this->fields);
 		
-		$pageEdit = $this->modules->get("ProcessPageEdit");
-		if($this->config->ajax && (isset($_SERVER['HTTP_X_FIELDNAME']) || count($_POST))) return $pageEdit->ajaxSave($this->pageContext);
+		$this->pageEdit = $this->modules->get("ProcessPageEdit");
+		if($this->config->ajax && (isset($_SERVER['HTTP_X_FIELDNAME']) || count($_POST))) return $this->pageEdit->ajaxSave($this->pageContext);
 	
 		
 		// Check if there is not such a page found
@@ -67,51 +70,53 @@ class FrediProcess extends Process {
 			
 		}
 		
-		// If form was submitted, process it
-		if ($this->input->post->submit) return $this->processSubmit();
+		
 		
 	
-		$form = $this->modules->get('InputfieldForm');
-		$form->attr("action", "./?id=$this->pageId&fields=$this->fields&modal=1");
-		$form->attr('method', 'post'); 
-		$form->attr('enctype', 'multipart/form-data'); 
+		$this->form = $this->modules->get('InputfieldForm');
+		$this->form->attr("action", "./?id=$this->pageId&fields=$this->fields&modal=1");
+		$this->form->attr('method', 'post'); 
+		$this->form->attr('enctype', 'multipart/form-data'); 
 		
-		
-		
-		
+		// Build the form (loop fields and add their respected inputfields)
 		foreach($this->fieldsArray as $fieldName) {
 			$field = $this->pageContext->fields->get($fieldName);
 			$inputField = $field->getInputfield($this->pageContext);
 			$inputField->value = $this->pageContext->{$fieldName};
 			
-			$form->add($inputField);
+			$this->form->add($inputField);
 			
 		}
 		
-		
 		$submit = $this->modules->get('InputfieldSubmit');
-		$form->add($submit);
+		$this->form->add($submit);
 		
+		// If form was submitted, process it
+		if ($this->input->post->submit) return $this->processSubmit();
+		
+		// Ajaxuploader likes this :)
 		$out = "<p style='display: none' id='PageIDIndicator'>$this->pageId</p>";
-		$out .= $form->render();
+		$out .= $this->form->render();
 		
 		return $out;
 	}
 	
 	public function processSubmit() {
 	
-
+		
 	
-		foreach($this->fieldsArray as $fieldName) {
-			$field = $this->pageContext->fields->get($fieldName);
-			if ($field->type instanceof FieldtypeFile) {
-				continue;
-			}
-			$this->pageContext->$fieldName = $this->input->post->$fieldName;
+		// Loop all the elements on the form
+		foreach($this->form->children as $field) {
+			// Process their values
+			$field->processInput($this->input->post);
+			// Set the new value for page
+			$this->pageContext->set($field->name, $field->value);
 		}
-		
+
+		// And finally save
 		$this->pageContext->save();
-		
+
+		// JS-reload to see the changes. I might think some kind of 
 		return "<h2>" . $this->_("Page saved") . "</h2><script>parent.location.reload()</script>";
 	}
 	

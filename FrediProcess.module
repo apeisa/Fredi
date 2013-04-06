@@ -55,6 +55,7 @@ class FrediProcess extends Process {
 		$this->fieldsArray = explode("|", $this->fields);
 		
 		$this->pageEdit = $this->modules->get("ProcessPageEdit");
+		$this->pageEdit->setTrackChanges(true);
 		if($this->config->ajax && (isset($_SERVER['HTTP_X_FIELDNAME']) || count($_POST))) return $this->pageEdit->ajaxSave($this->pageContext);
 	
 		
@@ -103,14 +104,30 @@ class FrediProcess extends Process {
 	
 	public function processSubmit() {
 	
-		
+		$this->form->setTrackChanges(true);
+		$this->pageContext->setTrackChanges(true);
 	
 		// Loop all the elements on the form
 		foreach($this->form->children as $field) {
 			// Process their values
+			$field->setTrackChanges(true);
+			
 			$field->processInput($this->input->post);
+			
+			
+			if(wire('languages') && $field->useLanguages) {
+				$v = $this->pageContext->get($field->name); 
+				if(is_object($v)) {
+					$v->setFromInputfield($field); 
+					$this->pageContext->set($field->name, $v); 
+					$this->pageContext->trackChange($field->name); 
+				}
+			} else { 
+				$this->pageContext->set($field->name, $field->value);
+			}
+			
 			// Set the new value for page
-			$this->pageContext->set($field->name, $field->value);
+			// $this->pageContext->set($field->name, $field->value);
 		}
 
 		// And finally save

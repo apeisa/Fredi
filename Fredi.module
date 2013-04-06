@@ -46,7 +46,7 @@ class Fredi extends WireData implements Module {
 	
 	public function editable() {
 	
-		$fieldsArray = explode($this->fields);
+		$fieldsArray = explode("|", $this->fields);
 		
 		foreach($fieldsArray as $fieldName) {
 			// Check if page has the field that wants to be edited

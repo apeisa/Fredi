@@ -1,0 +1,31 @@
+
+#frediModal {
+	background: white url(preload.gif) no-repeat center 50%;
+	position: fixed;
+	padding: 10px;
+	top: 8%;
+	left: 5%;
+	right: 5%;
+	bottom: 8%;
+	box-shadow: 0 0 10px 1px #000;
+	border-radius: 10px;
+}
+
+#frediModal iframe {
+	border: none;
+	width: 100%;
+	height: 100%;
+}
+
+#frediOuter {
+	background: #000;
+	opacity: 0.4;
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+}
+
+#frediClose {position:absolute; top:-15px; right:-20px; width:30px; height:30px; cursor:pointer; background:url(close.png) no-repeat}
+#frediClose:hover {background-position:0 -30px}

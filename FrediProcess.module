@@ -56,7 +56,10 @@ class FrediProcess extends Process {
 		
 		$this->pageEdit = $this->modules->get("ProcessPageEdit");
 		$this->pageEdit->setTrackChanges(true);
-		if($this->config->ajax && (isset($_SERVER['HTTP_X_FIELDNAME']) || count($_POST))) return $this->pageEdit->ajaxSave($this->pageContext);
+		if($this->config->ajax && (isset($_SERVER['HTTP_X_FIELDNAME']) || count($_POST))) {
+			$this->pageContext->trackChange($_SERVER['HTTP_X_FIELDNAME']); 
+			return $this->pageEdit->ajaxSave($this->pageContext);
+		}
 	
 		
 		// Check if there is not such a page found

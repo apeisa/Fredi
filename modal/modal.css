@@ -2,13 +2,13 @@
 #frediModal {
 	background: white url(preload.gif) no-repeat center 50%;
 	position: fixed;
-	top: 40%;
-	left: 40%;
+	top: 30%;
+	left: 30%;
 	padding: 0px;
 	height: 1px;
-	min-height: 20%;
+	min-height: 40%;
 	width: 1px;
-	min-width: 20%;
+	min-width: 40%;
 	-webkit-transition:all .2s ease;
     -moz-transition:all .2s ease;
     -ms-transition:all .2s ease;

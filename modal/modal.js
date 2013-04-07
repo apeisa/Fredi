@@ -16,7 +16,6 @@ var fredi = (function(){
 			document.body.appendChild(outerDiv);
 			document.body.appendChild(modalDiv);
 			
-			modalDiv.appendChild(closeIcon);
 			
 			// Load the hidden iframe
 			iframe.src=val;
@@ -29,8 +28,10 @@ var fredi = (function(){
 		loaded: function () {
 			iframe.style.display="block"; // Show the iframe
 			modalDiv.className="frediModalOpen";
+			modalDiv.appendChild(closeIcon);
 		},
 		close: function () {
+			modalDiv.removeChild(closeIcon);
 			document.body.removeChild(outerDiv);
 			document.body.removeChild(modalDiv);
 			modalDiv.className="";

@@ -23,7 +23,7 @@ class FrediProcess extends Process {
 		return array(
 			'title' => 'Fredi - field edit', 
 			'summary' => 'Edit just a single field.', 
-			'version' => 1, 
+			'version' => 100, 
 			'author' => 'Antti Peisa', 
 			'permission' => 'page-edit', 
 			); 

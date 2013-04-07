@@ -24,13 +24,16 @@ var fredi = (function(){
 			iframe.onload = function() {fredi.loaded()};
 			
 			modalDiv.appendChild(iframe); // Move it inside modal
+			
 		},
 		loaded: function () {
-			iframe.style.display="block"; // Show the iframe			
+			iframe.style.display="block"; // Show the iframe
+			modalDiv.className="frediModalOpen";
 		},
 		close: function () {
 			document.body.removeChild(outerDiv);
 			document.body.removeChild(modalDiv);
+			modalDiv.className="";
 		}
 	};
 }());

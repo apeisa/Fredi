@@ -110,6 +110,31 @@ echo $fredi->body($another_page);
 echo $fredi->render("headline|title|images|body", $another_page);
 ```
 
+### Setting custom text for edit links
+
+Fields and page context are special settings in Fredi, since those are set per edit link.
+All the other settings can be given through setter methods. Currently there is only one
+setting available and it gives possibility to overwrite the default edit text. These
+setter methods all return the $fredi object back, so you can chain these nicely.
+
+```php
+echo $fredi->setText("Edit bodytext")->body;
+// Or
+echo $fredi->setText("Manage footer images")->images($footer_settings_page);
+// Or
+echo $fredi->setText("Edit press release details")->render("title|summary|publishdate", $another_page);
+```
+
+Fredi has good memory, so when you once setText, it will remember it. You can always set
+new text or even reset to default.
+
+### Reset settings
+
+```php
+$fredi->reset(); // This will reset all the settings, currently only the link text
+```
+
+
 
 Support development
 -------------------------------------------------

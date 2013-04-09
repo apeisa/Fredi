@@ -54,13 +54,13 @@ class FrediProcess extends Process {
 		$this->pageContext->setTrackChanges(true); 
 		$this->fieldsArray = explode("|", $this->fields);
 		
+		// This is for the ajax stuff (like images and files)
 		$this->pageEdit = $this->modules->get("ProcessPageEdit");
 		$this->pageEdit->setTrackChanges(true);
 		if($this->config->ajax && (isset($_SERVER['HTTP_X_FIELDNAME']) || count($_POST))) {
 			$this->pageContext->trackChange($_SERVER['HTTP_X_FIELDNAME']); 
 			return $this->pageEdit->ajaxSave($this->pageContext);
 		}
-	
 		
 		// Check if there is not such a page found
 		if ( ! $this->pageContext->id) throw new WireException("Page not found");
@@ -87,7 +87,7 @@ class FrediProcess extends Process {
 			$field = $this->pageContext->fields->get($fieldName);
 			$inputField = $field->getInputfield($this->pageContext);
 			$inputField->value = $this->pageContext->{$fieldName};
-			
+			$inputField->columnWidth = 100;
 			$this->form->add($inputField);
 			
 		}
@@ -98,7 +98,7 @@ class FrediProcess extends Process {
 		// If form was submitted, process it
 		if ($this->input->post->submit) return $this->processSubmit();
 		
-		// Ajaxuploader likes this :)
+		// Ajaxuploader requires this
 		$out = "<p style='display: none' id='PageIDIndicator'>$this->pageId</p>";
 		$out .= $this->form->render();
 		
@@ -128,15 +128,12 @@ class FrediProcess extends Process {
 			} else { 
 				$this->pageContext->set($field->name, $field->value);
 			}
-			
-			// Set the new value for page
-			// $this->pageContext->set($field->name, $field->value);
 		}
 
-		// And finally save
+		// And save the page
 		$this->pageContext->save();
 
-		// JS-reload to see the changes. I might think some kind of 
+		// Finally a JS-reload to see the changes
 		return "<h2>" . $this->_("Page saved") . "</h2><script>parent.location.reload()</script>";
 	}
 	

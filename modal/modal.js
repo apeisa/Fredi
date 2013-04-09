@@ -2,13 +2,12 @@ var fredi = (function(){
 
 	var modalDiv,outerDiv,closeIcon,iframe;
 	
-	iframe=document.createElement('iframe');
+	iframe=document.createElement('iframe'); 
 	closeIcon=document.createElement('div'); closeIcon.id='frediClose'; 
 	modalDiv=document.createElement('div'); modalDiv.id='frediModal';
 	outerDiv=document.createElement('div'); outerDiv.id='frediOuter';
 	outerDiv.onclick = function() {fredi.close()};
 	closeIcon.onclick = function() {fredi.close()};
-	
 	
 	return {
 		modal: function( val ){
@@ -19,14 +18,15 @@ var fredi = (function(){
 			
 			// Load the hidden iframe
 			iframe.src=val;
-			iframe.style.display="none";
+			iframe.style.opacity="0";
 			iframe.onload = function() {fredi.loaded()};
+			iframe.allowTransparency=true;
 			
 			modalDiv.appendChild(iframe); // Move it inside modal
 			
 		},
 		loaded: function () {
-			iframe.style.display="block"; // Show the iframe
+			iframe.style.opacity="1";
 			modalDiv.className="frediModalOpen";
 			modalDiv.appendChild(closeIcon);
 		},

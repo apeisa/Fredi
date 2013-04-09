@@ -44,7 +44,7 @@ that is load them using this code:
 echo $fredi->renderScript();
 ```
 
-Good place to add above line is inside your <head></head>. Body is fine too, but it
+Good place to add above line is inside your head-tags. Body is fine too, but it
 should be loaded before the first edit link you want to provide. There isn't any 3rd
 party code dependencies, so it doesn't matter if you have loaded any other scripts or
 not.
@@ -143,6 +143,13 @@ to disable Fredi if you need it (call before you start outputting the links):
 $fredi->enabled = false;
 ```
 
+### Style your modal
+
+You can easily style your modal by just with your frontend css (maybe loading it only for
+editors?), but you can also style the editing iframe that is inside the modal. Just add
+FrediProcess.css file into your /site/modules/Fredi/ directory and that file will be
+automatically loaded inside the iframe. You can do same with Javascript also, then add file
+FrediProcess.js.
 
 License
 -------------------------------------------------

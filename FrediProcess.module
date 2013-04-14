@@ -38,7 +38,6 @@ class FrediProcess extends Process {
 	public $fieldsArray = array();
 	public $inputField;
 	public $pageEdit;
-	public $form;
 
 	public function init() {
 		parent::init(); // required
@@ -46,13 +45,11 @@ class FrediProcess extends Process {
 
 	public function ___execute() {
 	
-		
 		$this->pageId = (int) $this->input->get("id");
 		$this->fields = $this->input->get("fields");
 		
 		$this->pageContext = $this->pages->get($this->pageId);
 		$this->pageContext->setTrackChanges(true); 
-		$this->fieldsArray = explode("|", $this->fields);
 		
 		// This is for the ajax stuff (like images and files)
 		$this->pageEdit = $this->modules->get("ProcessPageEdit");
@@ -65,6 +62,28 @@ class FrediProcess extends Process {
 		// Check if there is not such a page found
 		if ( ! $this->pageContext->id) throw new WireException("Page not found");
 		
+		// Check that this page is editable by current user
+		if ( ! $this->pageContext->editable()) throw new WireException("You don't have right to edit this page");
+		
+		// Ajaxuploader requires this
+		$out = "<p style='display: none' id='PageIDIndicator'>$this->pageId</p>";
+		
+		// Check whether we should render whole page-edit form or just some fields
+		if ($this->fields === "frediAll") {
+			$out .= $this->renderPageForm();
+		} 
+		else {
+			$out .= $this->renderFieldsForm();
+		}
+		
+		return $out;
+		
+		
+	}
+	
+	public function renderFieldsForm() {
+		$this->fieldsArray = explode("|", $this->fields);
+		
 		foreach($this->fieldsArray as $fieldName) {
 			// Check if page has the field that wants to be edited
 			if ( ! $this->pageContext->fields->has($fieldName)) throw new WireException("There is no field $fieldName on editable page");
@@ -74,13 +93,10 @@ class FrediProcess extends Process {
 			
 		}
 		
-		
-		
-	
-		$this->form = $this->modules->get('InputfieldForm');
-		$this->form->attr("action", "./?id=$this->pageId&fields=$this->fields&modal=1");
-		$this->form->attr('method', 'post'); 
-		$this->form->attr('enctype', 'multipart/form-data'); 
+		$form = $this->modules->get('InputfieldForm');
+		$form->attr("action", "./?id=$this->pageId&fields=$this->fields&modal=1");
+		$form->attr('method', 'post'); 
+		$form->attr('enctype', 'multipart/form-data'); 
 		
 		// Build the form (loop fields and add their respected inputfields)
 		foreach($this->fieldsArray as $fieldName) {
@@ -88,35 +104,53 @@ class FrediProcess extends Process {
 			$inputField = $field->getInputfield($this->pageContext);
 			$inputField->value = $this->pageContext->{$fieldName};
 			$inputField->columnWidth = 100;
-			$this->form->add($inputField);
-			
+			$form->add($inputField);
 		}
 		
 		$submit = $this->modules->get('InputfieldSubmit');
-		$this->form->add($submit);
+		$form->add($submit);
 		
 		// If form was submitted, process it
-		if ($this->input->post->submit) return $this->processSubmit();
+		if (count($_POST)) return $this->processInput($form);
 		
-		// Ajaxuploader requires this
-		$out = "<p style='display: none' id='PageIDIndicator'>$this->pageId</p>";
-		$out .= $this->form->render();
+		$out .= $form->render();
 		
 		return $out;
 	}
 	
-	public function processSubmit() {
+	public function renderPageForm() {
 	
-		$this->form->setTrackChanges(true);
-		$this->pageContext->setTrackChanges(true);
+		$form = $this->modules->get('InputfieldForm');
+		$form = $this->pageEdit->buildForm($form);
+		$form->action = $form->action . "&fields=frediAll";
+		
+		if(count($_POST)) return $this->processInput($form);
 	
+		return $form->render();
+	}
+	
+	/*
+	 * This method is simplified version of /wire/modules/process/ProcessPageEdit.module processInput() method
+	 *
+	 * First process the input, then loops through all the form fields, set page field values and finally saves the page
+	 *
+	 * If field is wrapper, then iterates (this case only with full page save)
+	 *
+	 */
+	public function processInput(Inputfield $form, $level = 0) {
+	
+		$form->setTrackChanges(true);
+		//$this->pageContext->setTrackChanges(true);
+		
+		if(!$level) $form->processInput($this->input->post);
+		
 		// Loop all the elements on the form
-		foreach($this->form->children as $field) {
+		foreach($form->children as $field) {
 			// Process their values
 			$field->setTrackChanges(true);
 			
-			$field->processInput($this->input->post);
-			
+			//$field->processInput($this->input->post);
+
 			
 			if(wire('languages') && $field->useLanguages) {
 				$v = $this->pageContext->get($field->name); 
@@ -128,7 +162,11 @@ class FrediProcess extends Process {
 			} else { 
 				$this->pageContext->set($field->name, $field->value);
 			}
+			
+			if($field instanceof InputfieldWrapper && count($field->getChildren())) $this->processInput($field, $level + 1); 
 		}
+		
+		
 
 		// And save the page
 		$this->pageContext->save();
@@ -136,7 +174,7 @@ class FrediProcess extends Process {
 		// Finally a JS-reload to see the changes
 		return "<h2>" . $this->_("Page saved") . "</h2><script>parent.location.reload()</script>";
 	}
-	
+
 	
 
 

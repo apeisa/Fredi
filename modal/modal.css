@@ -1,7 +1,7 @@
-
 #frediModal {
 	background: white url(preload.gif) no-repeat center 50%;
 	position: fixed;
+	z-index: 999;
 	top: 30%;
 	left: 30%;
 	padding: 0px;

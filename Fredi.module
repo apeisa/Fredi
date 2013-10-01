@@ -5,7 +5,7 @@ class Fredi extends WireData implements Module {
 	public static function getModuleInfo() {
 		return array(
 			'title' => 'Fredi - friendly frontend editing for PW', 
-			'version' => 101, 
+			'version' => 102, 
 			'summary' => 'Adds frontend editing possibilities for ProcessWire',
 			'singular' => false,
 			'autoload' => false,
@@ -18,12 +18,9 @@ class Fredi extends WireData implements Module {
 	
 	protected $pageContext;
 	protected $fields;
-	
-	public static $counter = 0;
 
 	public function init() {
 		$this->reset();
-		self::$counter++;
 	}
 	
 	public function reset() {
@@ -120,17 +117,16 @@ class Fredi extends WireData implements Module {
 	
 	private function _renderLink() {
 	
-		$hash = self::$counter;
 		$fieldEdit = wire('pages')->get("template=admin, name=fredi-field-edit");
 		$url = "{$fieldEdit->httpUrl}?id={$this->pageContext->id}&fields={$this->fields}&modal=1";
 		
 		// Attach modal to onclick event
-		$onClick = "onclick='fredi.modal(\"$url\"); location.hash=\"fredi_$hash\"; return false;'";
+		$onClick = "onclick='fredi.modal(\"$url\"); return false;'";
 		
 		// Nice link classes to allow easy styling
 		$fieldsClass = str_replace("|", "-", $this->fields);
 		
-		$returnString = "<a class='fredi fredi-$fieldsClass' id='fredi_$hash' href='$url' $onClick>". $this->linkText ."</a>";
+		$returnString = "<a class='fredi fredi-$fieldsClass' href='$url' $onClick>". $this->linkText ."</a>";
 		
 		wire("session")->remove("linkcount");
 		return $returnString;

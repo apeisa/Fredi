@@ -58,7 +58,7 @@ class Fredi extends WireData implements Module {
 		$this->fields = $fields;
 		
 		if ( ! $this->editable()) return;
-		
+
 		return $this->_renderLink();
 	}
 	
@@ -118,7 +118,16 @@ class Fredi extends WireData implements Module {
 	private function _renderLink() {
 	
 		$fieldEdit = wire('pages')->get("template=admin, name=fredi-field-edit");
-		$url = "{$fieldEdit->httpUrl}?id={$this->pageContext->id}&fields={$this->fields}&modal=1";
+		
+		// if language support fields is installed
+		// we attach additional GET param for the languagefieldtabs module 
+		// or possibly other modules can pick this up. If default language do nothing
+		$userLanguageParam = '';
+		if(wire("modules")->isInstalled("LanguageSupportFields") && !wire("user")->language->isDefault()) {
+			$userLanguageParam = "&language=" . wire("user")->language->id;
+		}
+		
+		$url = "{$fieldEdit->httpUrl}?id={$this->pageContext->id}&fields={$this->fields}&modal=1$userLanguageParam";
 		
 		// Attach modal to onclick event
 		$onClick = "onclick='fredi.modal(\"$url\"); return false;'";
@@ -128,7 +137,6 @@ class Fredi extends WireData implements Module {
 		
 		$returnString = "<a class='fredi fredi-$fieldsClass' href='$url' $onClick>". $this->linkText ."</a>";
 		
-		wire("session")->remove("linkcount");
 		return $returnString;
 	}
 }

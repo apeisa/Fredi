@@ -82,6 +82,9 @@ class FrediProcess extends Process {
 	}
 	
 	public function renderFieldsForm() {
+		
+		$out = '';
+		
 		$this->fieldsArray = explode("|", $this->fields);
 		
 		foreach($this->fieldsArray as $fieldName) {

@@ -61,10 +61,13 @@ class FrediProcess extends Process {
 		$out = '';
 		$this->fieldsArray = explode("|", $this->fields);
 
+		// Support for wiretabs
+		$this->modules->get('ProcessPageEdit');
+
 		$form = $this->modules->get('InputfieldForm');
 		$form->attr('method', 'post'); 
 		$form->attr('enctype', 'multipart/form-data'); 
-		$form->attr('id', 'FrediForm');
+		$form->attr('id', 'ProcessPageEdit');
 		$form->attr("action", "{$this->config->urls->admin}page/edit/?id=$this->pageId&fields=$this->fields&modal=1");
 		
 		$fields = $this->pageContext->getInputfields();
@@ -99,7 +102,7 @@ class FrediProcess extends Process {
 		// This script will handle ajax post and also after post is success, it loads the parent page again
 		$script = "<script>
 $(document).ready( function() {
-  var form = $('#FrediForm');
+  var form = $('#ProcessPageEdit');
 
 
   form.submit( function(e) {

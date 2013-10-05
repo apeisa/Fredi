@@ -35,6 +35,13 @@ var fredi = (function(){
 			document.body.removeChild(outerDiv);
 			document.body.removeChild(modalDiv);
 			modalDiv.className="";
+		},
+		refresh: function() {
+			 var xhReq = new XMLHttpRequest();
+			 xhReq.open("GET", document.URL, false);
+			 xhReq.send(null);
+			 var serverResponse = xhReq.responseText;
+			 document.body.innerHTML = serverResponse;
 		}
 	};
 }());

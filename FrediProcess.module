@@ -140,7 +140,7 @@ $(document).ready( function() {
 		$page->template = 'admin';
 		$page->name = self::pageName; 
 
-		// installs to the admin "Setup" menu ... change as you see fit
+		// installs under admin => pages
 		$page->parent = $this->pages->get($this->config->adminRootPageID)->child('name=page');
 		$page->process = $this; 
 

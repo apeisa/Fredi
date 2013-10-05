@@ -49,7 +49,6 @@ class FrediProcess extends Process {
 		$this->fields = $this->input->get("fields");
 		
 		$this->pageContext = $this->pages->get($this->pageId);
-		//$this->pageContext->setTrackChanges(true); 
 		
 		// Check if there is not such a page found
 		if ( ! $this->pageContext->id) throw new WireException("Page not found");
@@ -113,12 +112,6 @@ class FrediProcess extends Process {
 		$submit = $this->modules->get('InputfieldSubmit');
 		$form->add($submit);
 
-		// If form was submitted, process it
-		if (count($_POST)) {
-			$this->pageEdit = $this->modules->get("ProcessPageEdit");
-			$this->pageEdit->execute();
-		}
-
 		// This script will handle ajax post and also after post is success, it loads the parent page again
 		$script = "<script>
 $(document).ready( function() {
@@ -146,24 +139,10 @@ $(document).ready( function() {
 
 } );
 </script>
-
 		";
-		
-		
+
 		return $form->render() . $script;
 	}
-
-	public function renderPageForm() {
-	
-		$form = $this->modules->get('InputfieldForm');
-		$form = $this->pageEdit->buildForm($form);
-		$form->action = $form->action . "&fields=frediAll";
-		
-		if(count($_POST)) return $this->processInput($form);
-	
-		return $form->render();
-	}
-
 
 	/**
 	 * Called only when your module is installed

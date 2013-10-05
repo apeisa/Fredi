@@ -60,14 +60,6 @@ class FrediProcess extends Process {
 
 		$out = '';
 		$this->fieldsArray = explode("|", $this->fields);
-		
-		foreach($this->fieldsArray as $fieldName) {
-			// Check if page has the field that wants to be edited
-			if ( ! $this->pageContext->fields->has($fieldName)) throw new WireException("There is no field $fieldName on editable page");
-				
-			// Check if the current user has rights to edit that field
-			if ( ! $this->pageContext->editable($fieldName)) throw new WireException("You don't have rights to edit field $fieldName");
-		}
 
 		$form = $this->modules->get('InputfieldForm');
 		$form->attr('method', 'post'); 
@@ -79,6 +71,13 @@ class FrediProcess extends Process {
 
 		// Remove the fields from form that are not wanted to be edited
 		if ($this->fields != "frediAll") {
+			foreach($this->fieldsArray as $fieldName) {
+				// Check if page has the field that wants to be edited
+				if ( ! $this->pageContext->fields->has($fieldName)) throw new WireException("There is no field $fieldName on editable page");
+					
+				// Check if the current user has rights to edit that field
+				if ( ! $this->pageContext->editable($fieldName)) throw new WireException("You don't have rights to edit field $fieldName");
+			}
 			foreach($fields as $field) {
 				if ( ! in_array($field->name, $this->fieldsArray)) {
 					$fields->remove($field);
@@ -105,9 +104,14 @@ $(document).ready( function() {
 
   form.submit( function(e) {
 
-  	// TODO: Maybe something similar is needed for CKeditor?
   	if (typeof tinyMCE == 'undefined') {}
   	else tinyMCE.triggerSave();
+
+  	if (typeof CKEDITOR == 'undefined') {}
+    else {
+    	for ( instance in CKEDITOR.instances )
+            CKEDITOR.instances[instance].updateElement();
+    }
 
     $.ajax( {
       type: 'POST',

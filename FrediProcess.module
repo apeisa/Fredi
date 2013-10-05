@@ -15,15 +15,11 @@
 
 class FrediProcess extends Process {
 
-	/**
-	 * Return information about this module (required)
-	 *
-	 */
 	public static function getModuleInfo() {
 		return array(
 			'title' => 'Fredi - field edit', 
 			'summary' => 'Edit just a single field.', 
-			'version' => 100, 
+			'version' => 103, 
 			'author' => 'Antti Peisa', 
 			'permission' => 'page-edit', 
 			); 
@@ -31,13 +27,10 @@ class FrediProcess extends Process {
 
 	const pageName = 'fredi-field-edit';
 	
-	
 	public $pageId;
 	public $pageContext;
 	public $fields;
 	public $fieldsArray = array();
-	public $inputField;
-	public $pageEdit;
 
 	public function init() {
 		parent::init(); // required
@@ -61,14 +54,11 @@ class FrediProcess extends Process {
 		$out .= $this->renderFieldsForm();
 		
 		return $out;
-		
-		
 	}
 	
 	public function renderFieldsForm() {
 
 		$out = '';
-		
 		$this->fieldsArray = explode("|", $this->fields);
 		
 		foreach($this->fieldsArray as $fieldName) {
@@ -87,11 +77,8 @@ class FrediProcess extends Process {
 		
 		$fields = $this->pageContext->getInputfields();
 
-		if ($this->fields === "frediAll") {
-			// No need to touch the fields
-		} 
-		// Remove the fields from form that are not on edit link
-		else {
+		// Remove the fields from form that are not wanted to be edited
+		if ($this->fields != "frediAll") {
 			foreach($fields as $field) {
 				if ( ! in_array($field->name, $this->fieldsArray)) {
 					$fields->remove($field);
@@ -118,6 +105,7 @@ $(document).ready( function() {
 
   form.submit( function(e) {
 
+  	// TODO: Maybe something similar is needed for CKeditor?
   	if (typeof tinyMCE == 'undefined') {}
   	else tinyMCE.triggerSave();
 
@@ -126,13 +114,10 @@ $(document).ready( function() {
       url: form.attr( 'action' ),
       data: form.serialize(),
       success: function( response ) {
-        console.log( response );
         window.parent.fredi.refresh();
       }
     } );
   e.preventDefault();
-  //window.parent.fredi.close();
-  
   } );
 
 } );

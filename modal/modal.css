@@ -1,5 +1,6 @@
+
 #frediModal {
-	background-color: white;
+	background: white url(preload.gif) no-repeat center 50%;
 	position: fixed;
 	top: 30%;
 	left: 30%;
@@ -8,15 +9,11 @@
 	min-height: 40%;
 	width: 1px;
 	min-width: 40%;
-}
-
-.loader {
-	background: white url(preload.gif) no-repeat center 50%;
-	-webkit-transition:all .2s ease;
-    -moz-transition:all .2s ease;
-    -ms-transition:all .2s ease;
-    -o-transition:all .2s ease;
-    transition:all .2s ease;    
+	-webkit-transition:all .1s;
+    -moz-transition:all .1s;
+    -ms-transition:all .1s;
+    -o-transition:all .1s;
+    transition:all .1s;    
 }
 
 #frediModal.frediModalOpen {

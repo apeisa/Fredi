@@ -116,6 +116,8 @@ $(document).ready( function() {
             CKEDITOR.instances[instance].updateElement();
     }
 
+    window.parent.fredi.empty();
+
     $.ajax( {
       type: 'POST',
       url: form.attr( 'action' ),
@@ -124,7 +126,9 @@ $(document).ready( function() {
         window.parent.fredi.refresh();
       }
     } );
-  e.preventDefault();
+	
+  	e.preventDefault();
+  	return false;
   } );
 
 } );

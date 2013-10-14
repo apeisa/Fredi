@@ -26,13 +26,10 @@ var fredi = (function(){
 		loaded: function () {
 			modalDiv.className="frediModalOpen";
 			modalDiv.appendChild(closeIcon);
-			var height = modalDiv.offsetHeight;
-			var width = modalDiv.offsetWidth;
 		},
 		empty: function () {
 			modalDiv.removeChild(closeIcon);
 			modalDiv.className='loader';
-
 		},
 		close: function () {
 			modalDiv.removeChild(closeIcon);

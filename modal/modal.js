@@ -24,12 +24,10 @@ var fredi = (function(){
 			
 		},
 		loaded: function () {
-
 			modalDiv.className="frediModalOpen";
 			modalDiv.appendChild(closeIcon);
 			var height = modalDiv.offsetHeight;
 			var width = modalDiv.offsetWidth;
-			console.log(width + " / "+ height);
 		},
 		empty: function () {
 			modalDiv.removeChild(closeIcon);
@@ -51,7 +49,7 @@ var fredi = (function(){
 			var dom = new DOMParser().parseFromString(serverResponse, "text/html");
 			bodyInner = dom.getElementsByTagName( 'body' )[0].innerHTML;
 			document.body.innerHTML = bodyInner;
-			
+
 		}
 	};
 }());

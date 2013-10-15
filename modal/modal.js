@@ -1,7 +1,8 @@
 var fredi = (function(){
 
-	var modalDiv,outerDiv,closeIcon,iframe;
-	
+	var modalDiv,outerDiv,closeIcon,iframe,url;
+	url = document.URL;
+
 	iframe=document.createElement('iframe'); 
 	closeIcon=document.createElement('div'); closeIcon.id='frediClose'; 
 	modalDiv=document.createElement('div'); modalDiv.id='frediModal'; modalDiv.className='loader';
@@ -24,6 +25,7 @@ var fredi = (function(){
 			
 		},
 		loaded: function () {
+			document.body.style.overflow = "hidden";
 			modalDiv.className="frediModalOpen";
 			modalDiv.appendChild(closeIcon);
 		},
@@ -32,69 +34,14 @@ var fredi = (function(){
 			modalDiv.className='loader';
 		},
 		close: function () {
+			document.body.style.overflow = "inherit";
 			modalDiv.removeChild(closeIcon);
 			document.body.removeChild(outerDiv);
 			document.body.removeChild(modalDiv);
 			modalDiv.className="loader";
 		},
 		refresh: function() {
-			var xhReq = new XMLHttpRequest();
-			var url = document.URL;
-			xhReq.open("GET", url, false);
-			xhReq.send(null);
-			var serverResponse = xhReq.responseText;
-			var dom = new DOMParser().parseFromString(serverResponse, "text/html");
-			bodyInner = dom.getElementsByTagName( 'body' )[0].innerHTML;
-			document.body.innerHTML = bodyInner;
-
+			window.location = url; 
 		}
 	};
 }());
-
-
-/*
- * DOMParser HTML extension
- * 2012-09-04
- * 
- * By Eli Grey, http://eligrey.com
- * Public domain.
- * NO WARRANTY EXPRESSED OR IMPLIED. USE AT YOUR OWN RISK.
- */
-
-/*! @source https://gist.github.com/1129031 */
-/*global document, DOMParser*/
-
-(function(DOMParser) {
-	"use strict";
-
-	var
-	  DOMParser_proto = DOMParser.prototype
-	, real_parseFromString = DOMParser_proto.parseFromString
-	;
-
-	// Firefox/Opera/IE throw errors on unsupported types
-	try {
-		// WebKit returns null on unsupported types
-		if ((new DOMParser).parseFromString("", "text/html")) {
-			// text/html parsing is natively supported
-			return;
-		}
-	} catch (ex) {}
-
-	DOMParser_proto.parseFromString = function(markup, type) {
-		if (/^\s*text\/html\s*(?:;|$)/i.test(type)) {
-			var
-			  doc = document.implementation.createHTMLDocument("")
-			;
-	      		if (markup.toLowerCase().indexOf('<!doctype') > -1) {
-        			doc.documentElement.innerHTML = markup;
-      			}
-      			else {
-        			doc.body.innerHTML = markup;
-      			}
-			return doc;
-		} else {
-			return real_parseFromString.apply(this, arguments);
-		}
-	};
-}(DOMParser));

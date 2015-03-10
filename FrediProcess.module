@@ -22,6 +22,7 @@ class FrediProcess extends Process {
 			'version' => 104, 
 			'author' => 'Antti Peisa', 
 			'permission' => 'page-edit', 
+			'requires' => array('Fredi'),
 			); 
 	}
 

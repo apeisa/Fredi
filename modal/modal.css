@@ -2,6 +2,7 @@
 #frediModal {
 	background: white url(preload.gif) no-repeat center 50%;
 	position: fixed;
+	z-index: 9999;
 	top: 30%;
 	left: 30%;
 	padding: 0px;
@@ -43,6 +44,7 @@
 	left: 0;
 	right: 0;
 	bottom: 0;
+	z-index: 9998;
 }
 
 #frediClose {position:absolute; top:-15px; left:-15px; width:30px; height:30px; cursor:pointer; background:url(close.png) no-repeat}

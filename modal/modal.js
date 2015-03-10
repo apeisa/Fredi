@@ -41,7 +41,8 @@ var fredi = (function(){
 			modalDiv.className="loader";
 		},
 		refresh: function() {
-			window.location = url; 
+			window.location.href = url;
+			location.reload();
 		}
 	};
 }());

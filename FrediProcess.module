@@ -29,7 +29,7 @@ class FrediProcess extends Process {
 	
 	public $pageId;
 	public $pageContext;
-	public $fields;
+	public $frediFields;
 	public $fieldsArray = array();
 
 	public function init() {
@@ -39,7 +39,7 @@ class FrediProcess extends Process {
 	public function ___execute() {
 	
 		$this->pageId = (int) $this->input->get("id");
-		$this->fields = $this->input->get("fields");
+		$this->frediFields = $this->input->get("frediFields");
 		
 		$this->pageContext = $this->pages->get($this->pageId);
 		
@@ -58,8 +58,10 @@ class FrediProcess extends Process {
 	
 	public function renderFieldsForm() {
 
+
+
 		$out = '';
-		$this->fieldsArray = explode("|", $this->fields);
+		$this->fieldsArray = explode("|", $this->frediFields);
 
 		// Support for wiretabs
 		$this->modules->get('ProcessPageEdit');
@@ -68,12 +70,14 @@ class FrediProcess extends Process {
 		$form->attr('method', 'post'); 
 		$form->attr('enctype', 'multipart/form-data'); 
 		$form->attr('id', 'ProcessPageEdit');
-		$form->attr("action", "{$this->config->urls->admin}page/edit/?id=$this->pageId&fields=$this->fields&modal=1");
-		
+		$form->attr("action", "{$this->config->urls->admin}page/edit/?id=$this->pageId&frediFields=$this->frediFields&modal=1");
+
 		$fields = $this->pageContext->getInputfields();
 
+
+
 		// Remove the fields from form that are not wanted to be edited
-		if ($this->fields != "frediAll") {
+		if ($this->frediFields != "frediAll") {
 			foreach($this->fieldsArray as $fieldName) {
 				// Check if page has the field that wants to be edited
 				if ( ! $this->pageContext->fields->has($fieldName)) throw new WireException("There is no field $fieldName on editable page");

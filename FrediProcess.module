@@ -120,6 +120,16 @@ class FrediProcess extends Process {
 		$page->title = $info['title'];
 		$page->addStatus(Page::statusHidden) ;
 
+		// support for multi-languages, set the status[langid] of alternative languages
+		// to active (1) so we can get the url when editing alternative languages / @soma
+		if($this->modules->isInstalled("LanguageSupportPageNames")){
+	    if(count($this->languages) > 1){
+        foreach($this->languages as $lang){
+          if(!$lang->isDefault()) $page->set("status$lang->id",1);
+        }
+	    }
+		}
+
 		// save the page
 		$page->save();
 

@@ -158,6 +158,7 @@ $(document).ready( function() {
 		// we will make the page title the same as our module title
 		$info = self::getModuleInfo();
 		$page->title = $info['title'];
+		$page->addStatus(Page::statusHidden) ;
 
 		// save the page
 		$page->save();

@@ -17,9 +17,9 @@ class FrediProcess extends Process {
 
 	public static function getModuleInfo() {
 		return array(
-			'title' => 'Fredi - field edit', 
-			'summary' => 'Edit just a single field.', 
-			'version' => 103, 
+			'title' => 'Fredi - edit page process', 
+			'summary' => 'Process module that Fredi uses for page editing.', 
+			'version' => 104, 
 			'author' => 'Antti Peisa', 
 			'permission' => 'page-edit', 
 			); 
@@ -40,6 +40,7 @@ class FrediProcess extends Process {
 	
 		$this->pageId = (int) $this->input->get("id");
 		$this->frediFields = $this->input->get("frediFields");
+		$this->fieldsArray = explode("|", $this->frediFields);
 		
 		$this->pageContext = $this->pages->get($this->pageId);
 		
@@ -49,105 +50,59 @@ class FrediProcess extends Process {
 		// Check that this page is editable by current user
 		if ( ! $this->pageContext->editable()) throw new WireException("You don't have right to edit this page");
 		
-		// Ajaxuploader requires this
-		$out = "<p style='display: none' id='PageIDIndicator'>$this->pageId</p>";
-		$out .= $this->renderFieldsForm();
-		
-		return $out;
+		// We basically replicate the ProcessPageEdit here
+		$pe = $this->modules->get('ProcessPageEdit');
+
+		// ...but we keep frediFields in get params
+		$pe->addHookAfter('buildForm', $this, 'alterAction'); 
+
+		// ...and modify the page edit form to contain only wanted fields
+		$pe->addHookAfter('buildFormContent', $this, 'filterFields'); 
+
+		// ...and finally we do javascript "refresh" instead traditional redirect
+		$pe->addHookBefore('processSaveRedirect', $this, 'saveRedirect'); 
+
+		return $pe->execute();
 	}
-	
-	public function renderFieldsForm() {
 
+	public function alterAction(HookEvent $event) {
+		$form = $event->return;
+		$form->attr("action", "./?id={$this->pageId}&modal=1&frediFields={$this->frediFields}"); 
+		$event->return = $form;		
+	}
 
+	// Loop through fields and remove the ones that we don't want to edit. Also some sanity checks here.
+	public function filterFields(HookEvent $event) {
 
-		$out = '';
-		$this->fieldsArray = explode("|", $this->frediFields);
+		// If we want all fields, we don't alter the form
+		if ($this->frediFields == "frediAll") return;
 
-		// Support for wiretabs
-		$this->modules->get('ProcessPageEdit');
-
-		$form = $this->modules->get('InputfieldForm');
-		$form->attr('method', 'post'); 
-		$form->attr('enctype', 'multipart/form-data'); 
-		$form->attr('id', 'ProcessPageEdit');
-		$form->attr("action", "{$this->config->urls->admin}page/edit/?id=$this->pageId&frediFields=$this->frediFields&modal=1");
-
-		$fields = $this->pageContext->getInputfields();
-
-
-
-		// Remove the fields from form that are not wanted to be edited
-		if ($this->frediFields != "frediAll") {
-			foreach($this->fieldsArray as $fieldName) {
-				// Check if page has the field that wants to be edited
-				if ( ! $this->pageContext->fields->has($fieldName)) throw new WireException("There is no field $fieldName on editable page");
-					
-				// Check if the current user has rights to edit that field
-				if ( ! $this->pageContext->editable($fieldName)) throw new WireException("You don't have rights to edit field $fieldName");
-			}
-			foreach($fields as $field) {
-				if ( ! in_array($field->name, $this->fieldsArray)) {
-					$fields->remove($field);
-				}
-			}
+		$inputfields = $event->return;
+		
+		
+		foreach($this->fieldsArray as $fieldName) {
+			// Check if page has the field that wants to be edited
+			if ( ! $this->pageContext->fields->has($fieldName)) throw new WireException("There is no field $fieldName on editable page");
+				
+			// Check if the current user has rights to edit that field
+			if ( ! $this->pageContext->editable($fieldName)) throw new WireException("You don't have rights to edit field $fieldName");
 		}
 
-		$form->add($fields);
-
-		$hiddenPageId = $this->modules->get('InputfieldHidden');
-		$hiddenPageId->attr("id", "Inputfield_id");
-		$hiddenPageId->attr("name", "id");
-		$hiddenPageId->value = $this->pageContext->id;
-		$form->add($hiddenPageId);
-
-		$submit = $this->modules->get('InputfieldSubmit');
-		$form->add($submit);
-
-		// This script will handle ajax post and also after post is success, it loads the parent page again
-		$script = "<script>
-$(document).ready( function() {
-  var form = $('#ProcessPageEdit');
-
-
-  form.submit( function(e) {
-
-  	if (typeof tinyMCE == 'undefined') {}
-  	else tinyMCE.triggerSave();
-
-  	if (typeof CKEDITOR == 'undefined') {}
-    else {
-    	for ( instance in CKEDITOR.instances )
-            CKEDITOR.instances[instance].updateElement();
-    }
-
-    window.parent.fredi.empty();
-
-    $.ajax( {
-      type: 'POST',
-      url: form.attr( 'action' ),
-      data: form.serialize(),
-      success: function( response ) {
-        window.parent.fredi.refresh();
-      }
-    } );
-	
-  	e.preventDefault();
-  	return false;
-  } );
-
-} );
-</script>
-		";
-
-		return $form->render() . $script;
+		foreach($inputfields as $field) {
+			if ( ! in_array($field->name, $this->fieldsArray)) {
+				$inputfields->remove($field);
+			}
+		}
+		
+		$event->return = $inputfields;
 	}
 
-	/**
-	 * Called only when your module is installed
-	 *
-	 * This version creates a new page with this Process module assigned. 
-	 *
-	 */
+	// After page save, empty the modal (to make visual difference right after save) and do js redirect on parent window
+	public function saveRedirect(HookEvent $event) {
+		$event->replace = true;
+		echo "<script>window.parent.fredi.empty(); window.parent.location.reload();</script>";
+	}
+
 	public function ___install() {
 
 		// create the page our module will be assigned to
@@ -171,21 +126,11 @@ $(document).ready( function() {
 		$this->message("Created Page: {$page->path}"); 
 	}
 
-	/**
-	 * Called only when your module is uninstalled
-	 *
-	 * This should return the site to the same state it was in before the module was installed. 
-	 *
-	 */
 	public function ___uninstall() {
-
-		// find the page we installed, locating it by the process field (which has the module ID)
-		// it would probably be sufficient just to locate by name, but this is just to be extra sure.
 		$moduleID = $this->modules->getModuleID($this); 
 		$page = $this->pages->get("template=admin, process=$moduleID, name=" . self::pageName); 
 
 		if($page->id) {
-			// if we found the page, let the user know and delete it
 			$this->message("Deleting Page: {$page->path}"); 
 			$page->delete();
 		}

@@ -1,7 +1,6 @@
 var fredi = (function(){
 
-	var modalDiv,outerDiv,closeIcon,iframe,url;
-	url = document.URL;
+	var modalDiv,outerDiv,closeIcon,iframe;
 
 	iframe=document.createElement('iframe'); 
 	closeIcon=document.createElement('div'); closeIcon.id='frediClose'; 
@@ -39,10 +38,6 @@ var fredi = (function(){
 			document.body.removeChild(outerDiv);
 			document.body.removeChild(modalDiv);
 			modalDiv.className="loader";
-		},
-		refresh: function() {
-			window.location.href = url;
-			location.reload();
 		}
 	};
 }());

@@ -18,10 +18,10 @@
 }
 
 #frediModal.frediModalOpen {
-	top: 5%;
-	left: 5%;
-	width: 90%;
-	height: 90%;
+	top: 3%;
+	left: 3%;
+	width: 94%;
+	height: 94%;
 }
 
 #frediModal iframe {

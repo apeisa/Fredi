@@ -27,7 +27,7 @@ class Fredi extends WireData implements Module {
 
 	public function reset() {
 		$this->linkText = $this->_("edit");
-		$this->linkClass = $this->_("");
+		$this->linkClass = "";
 	}
 
 	/*

@@ -2,10 +2,10 @@
 
 /**
  *
- * Copyright 2013 by Antti Peisa
+ * Copyright 2013-2015 by Antti Peisa
  *
  *
- * ProcessWire 2.3 
+ * ProcessWire 2.3, 2.4, 2.5, 2.6 
  * Copyright (C) 2012 by Ryan Cramer 
  * Licensed under GNU/GPL v2, see LICENSE.TXT
  * 
@@ -13,13 +13,13 @@
  *
  */
 
-class FrediProcess extends Process {
+class FrediProcess extends Process implements WirePageEditor {
 
 	public static function getModuleInfo() {
 		return array(
 			'title' => 'Fredi - edit page process', 
 			'summary' => 'Process module that Fredi uses for page editing.', 
-			'version' => 110, 
+			'version' => 111, 
 			'author' => 'Antti Peisa', 
 			'permission' => 'page-edit', 
 			'requires' => array('Fredi'),
@@ -43,6 +43,14 @@ class FrediProcess extends Process {
 		$this->frediFields = $this->input->get("frediFields");
 		$this->fieldsArray = explode("|", $this->frediFields);
 		$this->hideTabsArray = explode("|", $this->input->get->hideTabs);
+
+		// We basically replicate the ProcessPageEdit here
+		$pe = $this->modules->get('ProcessPageEdit');
+
+		// Pagetable or similar
+		if ( ! $this->frediFields) {
+			return $pe->execute();
+		}
 		
 		$this->pageContext = $this->pages->get($this->pageId);
 		
@@ -52,8 +60,6 @@ class FrediProcess extends Process {
 		// Check that this page is editable by current user
 		if ( ! $this->pageContext->editable()) throw new WireException("You don't have right to edit this page");
 		
-		// We basically replicate the ProcessPageEdit here
-		$pe = $this->modules->get('ProcessPageEdit');
 
 		// ...but we keep frediFields in get params
 		$pe->addHookAfter('buildForm', $this, 'alterAction'); 
@@ -68,8 +74,12 @@ class FrediProcess extends Process {
 		if ($this->hideChildrenTab || in_array("children", $this->hideTabsArray)) $pe->addHookBefore('buildFormChildren', $this, 'hideTab');
 		if ($this->hideDeleteTab || in_array("delete", $this->hideTabsArray)) $pe->addHookBefore('buildFormDelete', $this, 'hideTab');
 		
-
 		return $pe->execute();
+	}
+
+	// WirePageEditor requires this one
+	public function getPage() {
+		return $this->pages->get((int) $this->input->get->id);
 	}
 
 	public function hideTab(HookEvent $event) {

@@ -2,7 +2,7 @@
 Fredi - Friendly Frontend Editing for ProcessWire
 =================================================
 
-(c) Antti Peisa 2013
+(c) Antti Peisa 2013-2015
 
 
 Introduction
@@ -75,8 +75,9 @@ echo $page->body;
 It will show "edit" link right before your body field. Link will be shown only for
 logged in users that have rights to edit that page (or to be precise, that field).
 
-You can of course put $fredi->body where ever you like, it doesn't have to be close
-to $page->body in your markup.
+On version 1.1.0 and up, Fredi links will be automatically styled and positioned in
+relation of the parent element. You can of course tweak the styling with your own
+css.
 
 
 ### Editing multiple fields
@@ -87,6 +88,15 @@ with multiple fields:
 
 ```php
 echo $fredi->render("headline|title|summary");
+```
+
+
+### Editing all the fields
+
+If you want to show all the fields, you can achieve that with renderAll method:
+
+```php
+echo $fredi->renderAll();
 ```
 
 
@@ -110,7 +120,7 @@ echo $fredi->body($another_page);
 echo $fredi->render("headline|title|images|body", $another_page);
 ```
 
-### Setting custom text for edit links
+### Setting custom text and classes for edit links
 
 Fields and page context are special settings in Fredi, since those are set per edit link.
 All the other settings can be given through setter methods. Currently there is only one
@@ -128,10 +138,30 @@ echo $fredi->setText("Edit press release details")->render("title|summary|publis
 Fredi has good memory, so when you once setText, it will remember it. You can always set
 new text or even reset to default.
 
+You can also add additional css classes for link element:
+```php
+echo $fredi->setClass("featured")->body;
+// Or
+echo $fredi->setClass("featured small")->body;
+```
+
+
+### Hiding tabs
+
+In context of inline editing, the additional tabs (Children, Settings and Delete) might be
+undesirable. You can edit ProcessFredi settings to globally disable those from Fredi modals.
+Other option is to disable them case by case. It works in similar manner like setText above:
+
+```php
+echo $fredi->hideTabs("children");
+// Or
+echo $fredi->hideTabs("children|delete|settings");
+```
+
 ### Reset settings
 
 ```php
-$fredi->reset(); // This will reset all the settings, currently only the link text
+$fredi->reset(); // This will reset all the settings: link text, classes and tabs hiding.
 ```
 
 
@@ -149,32 +179,6 @@ If you are short on money, you can also support yourself by listening great Finn
 Fredi.
 
 
-Tips and tricks
--------------------------------------------------
-
-### Style your edit links
-
-Use your site css to style the edit links that Fredi creates. They all have class .fredi
-and also additional class like .fredi-field or .fredi-field-anotherfield. You might even
-use some image replacement and use pen icon instead of boring text. Go wild!
-
-### Create Fredi switcher
-
-Since all the Fredi links have .fredi class, you might write line or two javascript to
-create switcher which shows or hides the links Fredi creates. There is also php option
-to disable Fredi if you need it (call before you start outputting the links):
-
-```php
-$fredi->enabled = false;
-```
-
-### Style your modal
-
-You can easily style your modal by just with your frontend css (maybe loading it only for
-editors?), but you can also style the editing iframe that is inside the modal. Just add
-FrediProcess.css file into your /site/modules/Fredi/ directory and that file will be
-automatically loaded inside the iframe. You can do same with Javascript also, then add file
-FrediProcess.js.
 
 License
 -------------------------------------------------

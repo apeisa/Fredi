@@ -1,11 +1,11 @@
 <?php
 
-class Fredi extends WireData implements Module {
+class Fredi extends WireData implements Module, ConfigurableModule {
 
 	public static function getModuleInfo() {
 		return array(
 			'title' => 'Fredi - friendly frontend editing for PW',
-			'version' => 105,
+			'version' => 110,
 			'summary' => 'Adds frontend editing possibilities for ProcessWire',
 			'singular' => false,
 			'autoload' => false,
@@ -16,6 +16,7 @@ class Fredi extends WireData implements Module {
 	public $enabled = TRUE;
 	public $linkText;
 	public $linkClass;
+	public $hideTabs;
 
 	protected $pageContext;
 	protected $frediFields;
@@ -28,6 +29,7 @@ class Fredi extends WireData implements Module {
 	public function reset() {
 		$this->linkText = $this->_("edit");
 		$this->linkClass = "";
+		$this->hideTabs = "";
 	}
 
 	/*
@@ -36,7 +38,9 @@ class Fredi extends WireData implements Module {
 	 */
 	public function renderScript() {
 		$out  = "<link rel='stylesheet' href='". wire('config')->urls->siteModules ."Fredi/modal/modal.css' />\n\t";
+		$out .= "<link rel='stylesheet' href='". wire('config')->urls->siteModules ."Fredi/css/fredi.css' />\n\t";
 		$out .= "<script src='". wire('config')->urls->siteModules ."Fredi/modal/modal.js'></script>";
+		$out .= "<script src='". wire('config')->urls->siteModules ."Fredi/js/fredi.js'></script>";
 		return $out;
 	}
 
@@ -45,12 +49,13 @@ class Fredi extends WireData implements Module {
 		return $this;
 	}
 
-	/*
-	 *
-	 * @return additional CSS classes for the edit link.
-	 */
 	public function setClass($linkClass) {
 		$this->linkClass = $linkClass;
+		return $this;
+	}
+
+	public function hideTabs($tabs) {
+		$this->hideTabs = $tabs;
 		return $this;
 	}
 
@@ -139,7 +144,7 @@ class Fredi extends WireData implements Module {
 			$userLanguageParam = "&language=" . wire("user")->language->id;
 		}
 
-		$url = "{$fieldEdit->httpUrl}?id={$this->pageContext->id}&frediFields={$this->frediFields}&modal=1$userLanguageParam";
+		$url = "{$fieldEdit->httpUrl}?id={$this->pageContext->id}&frediFields={$this->frediFields}&hideTabs={$this->hideTabs}&modal=1$userLanguageParam";
 
 		// Nice classes and id to links for easy styling and keep scroll position after refresh
 		$fieldsClass = "fredi-" . $this->pageContext->id . "-" . str_replace("|", "-", $this->frediFields);
@@ -147,7 +152,7 @@ class Fredi extends WireData implements Module {
 		// Attach modal to onclick event
 		$onClick = "onclick='fredi.modal(\"{$url}\"); return false;'";
 
-		$returnString = "<a class='fredi ".$this->linkClass ." {$fieldsClass}' href='{$url}' $onClick>". $this->linkText ."</a>";
+		$returnString = "<span class='frediwrapper'><a class='fredi {$this->linkClass} {$fieldsClass}' href='{$url}' $onClick>". $this->linkText ."</a></span>";
 
 		return $returnString;
 	}

@@ -19,7 +19,7 @@ class FrediProcess extends Process {
 		return array(
 			'title' => 'Fredi - edit page process', 
 			'summary' => 'Process module that Fredi uses for page editing.', 
-			'version' => 104, 
+			'version' => 110, 
 			'author' => 'Antti Peisa', 
 			'permission' => 'page-edit', 
 			'requires' => array('Fredi'),
@@ -42,6 +42,7 @@ class FrediProcess extends Process {
 		$this->pageId = (int) $this->input->get("id");
 		$this->frediFields = $this->input->get("frediFields");
 		$this->fieldsArray = explode("|", $this->frediFields);
+		$this->hideTabsArray = explode("|", $this->input->get->hideTabs);
 		
 		$this->pageContext = $this->pages->get($this->pageId);
 		
@@ -63,7 +64,18 @@ class FrediProcess extends Process {
 		// ...and finally we do javascript "refresh" instead traditional redirect
 		$pe->addHookBefore('processSaveRedirect', $this, 'saveRedirect'); 
 
+		if ($this->hideSettingsTab || in_array("settings", $this->hideTabsArray)) $pe->addHookBefore('buildFormSettings', $this, 'hideTab');
+		if ($this->hideChildrenTab || in_array("children", $this->hideTabsArray)) $pe->addHookBefore('buildFormChildren', $this, 'hideTab');
+		if ($this->hideDeleteTab || in_array("delete", $this->hideTabsArray)) $pe->addHookBefore('buildFormDelete', $this, 'hideTab');
+		
+
 		return $pe->execute();
+	}
+
+	public function hideTab(HookEvent $event) {
+		$event->replace = true;
+		$wrapper = new InputfieldWrapper;
+		$event->return = $wrapper;
 	}
 
 	public function alterAction(HookEvent $event) {

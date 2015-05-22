@@ -1,0 +1,6 @@
+.fredi {display: none; position: absolute; top: 0; right: 0; background: #ddd; color: #666; text-decoration: none; padding: 0.5em}
+.fredi.freditouch {display: block;}
+.fredi:hover {text-decoration: underline;}
+.frediwrapper {display: block; position: relative; z-index: 9998;}
+.frediparent:hover {outline: 3px solid #ddd;}
+.frediparent:hover .fredi {display: block;}

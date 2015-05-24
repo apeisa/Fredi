@@ -1,6 +1,6 @@
 <?php
 
-class Fredi extends WireData implements Module, ConfigurableModule {
+class Fredi extends WireData implements Module {
 
 	public static function getModuleInfo() {
 		return array(

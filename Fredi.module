@@ -5,7 +5,7 @@ class Fredi extends WireData implements Module {
 	public static function getModuleInfo() {
 		return array(
 			'title' => 'Fredi - friendly frontend editing for PW',
-			'version' => 111,
+			'version' => 112,
 			'summary' => 'Adds frontend editing possibilities for ProcessWire',
 			'singular' => false,
 			'autoload' => false,

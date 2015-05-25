@@ -3,4 +3,4 @@
 .fredi:hover {text-decoration: underline;}
 .frediwrapper {display: block; position: relative; z-index: 9998;}
 .frediparent:hover {outline: 3px solid #ddd;}
-.frediparent:hover .fredi {display: block;}
+.frediparent:hover > .frediwrapper > .fredi {display: block;}

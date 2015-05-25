@@ -5,7 +5,7 @@ class Fredi extends WireData implements Module {
 	public static function getModuleInfo() {
 		return array(
 			'title' => 'Fredi - friendly frontend editing for PW',
-			'version' => 112,
+			'version' => 120,
 			'summary' => 'Adds frontend editing possibilities for ProcessWire',
 			'singular' => false,
 			'autoload' => false,
@@ -90,6 +90,17 @@ class Fredi extends WireData implements Module {
 		return $this->_renderLink();
 	}
 
+  public function addPage($template, $fields = "title", Page $parent = null) {
+    if (is_null($parent)) $parent = wire('page');
+    $fieldEdit = wire('pages')->get("template=admin, name=fredi-field-edit");
+
+    $userLanguageParam = $this->_getLanguageParam();
+    $url = "{$fieldEdit->httpUrl}add/?parent_id={$parent->id}&template={$template}&fields={$fields}&modal=1$userLanguageParam";
+    $onClick = "onclick='fredi.modal(\"{$url}\"); return false;'";
+
+    return "<a class='fredi-add {$this->linkClass}' href='{$url}' $onClick>{$this->linkText}</a>";
+  }
+
 	public function editable() {
 
 		$fieldsArray = explode("|", $this->frediFields);
@@ -133,17 +144,20 @@ class Fredi extends WireData implements Module {
 		return $this->_renderLink();
 	}
 
+  private function _getLanguageParam() {
+    if(wire("modules")->isInstalled("LanguageSupportFields") && !wire("user")->language->isDefault()) {
+      return "&language=" . wire("user")->language->id;
+    }
+  }
+
 	private function _renderLink() {
 		$fieldEdit = wire('pages')->get("template=admin, name=fredi-field-edit");
 
 		// if language support fields is installed
 		// we attach additional GET param for the languagefieldtabs module
 		// or possibly other modules can pick this up. If default language do nothing
-		$userLanguageParam = '';
-		if(wire("modules")->isInstalled("LanguageSupportFields") && !wire("user")->language->isDefault()) {
-			$userLanguageParam = "&language=" . wire("user")->language->id;
-		}
-
+		$userLanguageParam = $this->_getLanguageParam();
+		
 		$url = "{$fieldEdit->httpUrl}?id={$this->pageContext->id}&frediFields={$this->frediFields}&hideTabs={$this->hideTabs}&modal=1$userLanguageParam";
 
 		// Nice classes and id to links for easy styling and keep scroll position after refresh

@@ -19,7 +19,7 @@ class FrediProcess extends Process implements WirePageEditor {
 		return array(
 			'title' => 'Fredi - edit page process', 
 			'summary' => 'Process module that Fredi uses for page editing.', 
-			'version' => 111, 
+			'version' => 120, 
 			'author' => 'Antti Peisa', 
 			'permission' => 'page-edit', 
 			'requires' => array('Fredi'),
@@ -75,6 +75,52 @@ class FrediProcess extends Process implements WirePageEditor {
 		if ($this->hideDeleteTab || in_array("delete", $this->hideTabsArray)) $pe->addHookBefore('buildFormDelete', $this, 'hideTab');
 		
 		return $pe->execute();
+	}
+
+	public function executeAdd() {
+
+
+		$parent_id = (int)$this->input->get->parent_id;
+		$parent = $this->pages->get($parent_id);
+		$template = $this->input->get->template;
+		$fields = $this->input->get->fields;
+		$fieldsArray = explode("|", $fields);
+
+		$out = "<h2>Adding new page under $parent->title</h2><p>{$parent->path}</p>";
+
+		$p = new Page();
+		$p->template = $template;
+		$p->parent = $parent;
+		
+
+		$form = $this->modules->get("InputfieldForm");
+		$form->method = "post";
+		$form->action = "./?parent_id={$parent_id}&template={$template}&fields={$fields}&modal=1";
+		foreach ($fieldsArray as $field) {
+			$f = $this->fields->get($field)->getInputfield($p);
+			$form->add($f);
+		}
+		$submit = $this->modules->get("InputfieldSubmit");
+		$submit->value = __("Create new page");
+		$submit->attr("name", "submit");
+		$form->add($submit);
+
+		if ($this->input->post->submit) {
+    	$form->processInput($this->input->post);
+    	if($form->getErrors()) {
+    		$out .= $form->render();
+    	} else {
+    		foreach ($fieldsArray as $field) {
+    			$p->$field = $form->get($field)->value;
+    		}
+    		$p->save();
+    		return "<script>window.parent.fredi.empty(); window.parent.location.replace('{$p->httpUrl}');</script>";
+    	}
+		} else {
+			$out .= $form->render();
+		}
+
+		return $out;
 	}
 
 	// WirePageEditor requires this one

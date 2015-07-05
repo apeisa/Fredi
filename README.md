@@ -44,10 +44,21 @@ that is load them using this code:
 echo $fredi->renderScript();
 ```
 
+It also includes fredi.js and fredi.css files, which creates "show only when hovered" 
+styling. This is not optimal in all cases, so you can disable them by giving false 
+as first param for renderScript method.
+
+```php
+echo $fredi->renderScript(false);
+```
+
 Good place to add above line is inside your head-tags. Body is fine too, but it
 should be loaded before the first edit link you want to provide. There isn't any 3rd
 party code dependencies, so it doesn't matter if you have loaded any other scripts or
 not.
+
+Using renderScript method is not required, you can load script other ways also (if you 
+are using some common means to add styles and scripts to your site).
 
 That's it, now you are ready for Fredi!
 

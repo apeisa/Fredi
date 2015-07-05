@@ -36,11 +36,13 @@ class Fredi extends WireData implements Module {
    *
    * @return Required <link> and <script> tags that are intended to go inside sites <head> tag.
    */
-  public function renderScript() {
+  public function renderScript($hoverLinks = true) {
     $out  = "<link rel='stylesheet' href='". wire('config')->urls->siteModules ."Fredi/modal/modal.css' />\n\t";
-    $out .= "<link rel='stylesheet' href='". wire('config')->urls->siteModules ."Fredi/css/fredi.css' />\n\t";
     $out .= "<script src='". wire('config')->urls->siteModules ."Fredi/modal/modal.js'></script>";
-    $out .= "<script src='". wire('config')->urls->siteModules ."Fredi/js/fredi.js'></script>";
+    if ($hoverLinks) {
+      $out .= "<link rel='stylesheet' href='". wire('config')->urls->siteModules ."Fredi/css/fredi.css' />\n\t";
+      $out .= "<script src='". wire('config')->urls->siteModules ."Fredi/js/fredi.js'></script>";
+    }
     return $out;
   }
 

@@ -1,4 +1,4 @@
-function init() {
+document.addEventListener("DOMContentLoaded", function(event) {
   // Thanks to feature.js / @viljamis
   var touch = !!(("ontouchstart" in window) || window.navigator && window.navigator.msPointerEnabled && window.MSGesture || window.DocumentTouch && document instanceof DocumentTouch);
   var fredilinks = document.getElementsByClassName("fredi");
@@ -9,5 +9,4 @@ function init() {
     var parent = elem.parentElement.parentElement;
     parent.className = parent.className + " frediparent";
   }
-}
-window.onload = init;
+});

@@ -91,14 +91,10 @@ class Fredi extends WireData implements Module {
   }
 
   public function addPage($template, $fields = "title", Page $parent = null) {
-    if (is_null($parent)) $parent = wire('page');
-
-    if ($parent->id > 1) {
-      if ( ! $parent->addable()) return;
-    } else {
-      if (wire('user')->isGuest()) return;
-    }
-
+    if ($parent instanceof NullPage || is_null($parent)) $parent = wire('page');
+  
+    if ( ! $parent->addable()) return;
+    
     $fieldEdit = wire('pages')->get("template=admin, name=fredi-field-edit");
 
     $userLanguageParam = $this->_getLanguageParam();

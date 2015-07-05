@@ -153,9 +153,9 @@ undesirable. You can edit ProcessFredi settings to globally disable those from F
 Other option is to disable them case by case. It works in similar manner like setText above:
 
 ```php
-echo $fredi->hideTabs("children");
+echo $fredi->hideTabs("children")->body;
 // Or
-echo $fredi->hideTabs("children|delete|settings");
+echo $fredi->hideTabs("children|delete|settings")->body;
 ```
 
 ### Reset settings

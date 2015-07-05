@@ -86,7 +86,7 @@ class FrediProcess extends Process implements WirePageEditor {
     $fields = $this->input->get->fields;
     $fieldsArray = explode("|", $fields);
 
-    $out = "<h2>Adding new page under $parent->title</h2><p>{$parent->path}</p>";
+    $out = "<h2>" . sprintf(__("Adding new page under %s"), $parent->title) . "</h2><p>{$parent->path}</p>";
 
     $p = new Page();
     $p->template = $template;

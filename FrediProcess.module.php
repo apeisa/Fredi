@@ -19,7 +19,7 @@ class FrediProcess extends Process implements WirePageEditor {
     return array(
       'title' => 'Fredi - edit page process', 
       'summary' => 'Process module that Fredi uses for page editing.', 
-      'version' => 120, 
+      'version' => 121, 
       'author' => 'Antti Peisa', 
       'permission' => 'page-edit', 
       'requires' => array('Fredi'),
@@ -114,7 +114,7 @@ class FrediProcess extends Process implements WirePageEditor {
           $p->$field = $form->get($field)->value;
         }
         $p->save();
-        return "<script>window.parent.fredi.empty(); window.parent.location.replace('{$p->httpUrl}');</script>";
+        return "<script>window.parent.fredi.empty(); window.parent.location.reload();</script>";
       }
     } else {
       $out .= $form->render();
